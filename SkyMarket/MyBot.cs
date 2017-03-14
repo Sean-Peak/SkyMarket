@@ -15,7 +15,7 @@ namespace SkyMarket
         DiscordClient discord;
         public MyBot()
         {
-            Tuple<string, Nullable<double>>[] games =
+            var games = new List<Tuple <string, Nullable<double>>>() 
                       { new Tuple<string, Nullable<double>>("Fallout 3:    $", 13.95),
                         new Tuple<string, Nullable<double>>("GTA V:    $", 45.95),
                         new Tuple<string, Nullable<double>>("Rocket League:    $", 19.95) };
@@ -30,12 +30,20 @@ namespace SkyMarket
 
             discord.UsingCommands(x =>
             {
-                x.PrefixChar = '!';
+                x.PrefixChar = '$';
                 x.AllowMentionPrefix = true;
 
             });
 
             var commands = discord.GetService<CommandService>();
+
+            commands.CreateCommand("sell").Parameter("Game", ParameterType.Required).Parameter("Price", ParameterType.Required)
+                .Do((e) =>
+                {
+                    games.Add(new Tuple<string, double?>(e.GetArg("Game") + ":    $", Convert.ToDouble(e.GetArg("Price"))));
+                    e.Channel.SendMessage("Thankyou " + "@" + e.User.Name + " For listing " + e.GetArg("Game") + ". Your game is now available to the public for purchase!");
+                });
+
 
             commands.CreateCommand("catalogue")
                 .Do(async (e) =>
