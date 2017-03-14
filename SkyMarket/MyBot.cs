@@ -10,12 +10,19 @@ namespace SkyMarket
 {
     class MyBot
     {
+        string games_p = null;
+
         DiscordClient discord;
         public MyBot()
         {
-            
+            Tuple<string, Nullable<double>>[] games =
+                      { new Tuple<string, Nullable<double>>("Fallout 3:    $", 13.95),
+                        new Tuple<string, Nullable<double>>("GTA V:    $", 45.95),
+                        new Tuple<string, Nullable<double>>("Rocket League:    $", 19.95) };
 
-            discord = new DiscordClient(x =>
+           
+
+        discord = new DiscordClient(x =>
             {
                 x.LogLevel = LogSeverity.Info;
                 x.LogHandler = Log;
@@ -30,10 +37,14 @@ namespace SkyMarket
 
             var commands = discord.GetService<CommandService>();
 
-            commands.CreateCommand("test")
+            commands.CreateCommand("catalogue")
                 .Do(async (e) =>
                  {
-                     await e.Channel.SendMessage("worked");
+                     foreach (var game in games)
+                     {
+                         await e.Channel.SendMessage(game.ToString().Replace("(", string.Empty).Replace(")", string.Empty).Replace(",", string.Empty) + " NZD");
+                     }
+
                  });
 
             discord.ExecuteAndWait( async () => 
